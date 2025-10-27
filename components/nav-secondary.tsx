@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { supabase } from "@/app/lib/supabase";
 import { useRouter } from "next/navigation";
-import { IconHelp, IconSettings } from "@tabler/icons-react";
+import { IconLogout, IconSettings } from "@tabler/icons-react";
 
 export function NavSecondary({ ...props }) {
   const router = useRouter();
@@ -33,7 +33,7 @@ export function NavSecondary({ ...props }) {
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} asChild>
               <div className="flex">
-                <IconHelp />
+                <IconLogout />
                 <span>Logout</span>
               </div>
             </SidebarMenuButton>

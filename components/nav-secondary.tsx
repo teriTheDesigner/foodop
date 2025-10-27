@@ -1,7 +1,4 @@
-"use client"
-
-import * as React from "react"
-import { type Icon } from "@tabler/icons-react"
+"use client";
 
 import {
   SidebarGroup,
@@ -9,34 +6,40 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { supabase } from "@/app/lib/supabase";
+import { useRouter } from "next/navigation";
+import { IconHelp, IconSettings } from "@tabler/icons-react";
 
-export function NavSecondary({
-  items,
-  ...props
-}: {
-  items: {
-    title: string
-    url: string
-    icon: Icon
-  }[]
-} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+export function NavSecondary({ ...props }) {
+  const router = useRouter();
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <div className="flex">
+                <IconSettings />
+                <span>Settings</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout} asChild>
+              <div className="flex">
+                <IconHelp />
+                <span>Logout</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

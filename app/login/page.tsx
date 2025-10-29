@@ -4,14 +4,20 @@ import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useRouter } from "next/navigation";
 import { LoginForm } from "@/components/login-form";
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/store";
 
 export default function LoginPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) router.push("/");
+      if (data.session) {
+        dispatch(setUser(data.session.user));
+        router.push("/dashboard");
+      }
     });
   }, [router]);
 
@@ -23,7 +29,10 @@ export default function LoginPage() {
     });
 
     if (error) alert("Login failed: " + error.message);
-    else if (data.session) router.push("/");
+    else if (data.session) {
+      dispatch(setUser(data.session.user));
+      router.push("/dashboard");
+    }
 
     setLoading(false);
   };

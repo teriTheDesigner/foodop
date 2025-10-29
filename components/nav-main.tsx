@@ -29,11 +29,11 @@ export function NavMain() {
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <Link href="/">
+            <Link href="/dashboard">
               <SidebarMenuButton
                 tooltip="Dashboard"
                 className={`${
-                  pathname === "/"
+                  pathname === "/dashboard"
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
                     : ""
                 }`}
@@ -44,11 +44,11 @@ export function NavMain() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/users">
+            <Link href="/dashboard/users">
               <SidebarMenuButton
                 tooltip="Users"
                 className={`${
-                  pathname === "/users"
+                  pathname === "/dashboard/users"
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
                     : ""
                 } `}
@@ -59,11 +59,11 @@ export function NavMain() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/analytics">
+            <Link href="/dashboard/analytics">
               <SidebarMenuButton
                 tooltip="Analytics"
                 className={`${
-                  pathname === "/analytics"
+                  pathname === "/dashboard/analytics"
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
                     : ""
                 }`}
@@ -74,11 +74,11 @@ export function NavMain() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/issues">
+            <Link href="/dashboard/issues">
               <SidebarMenuButton
                 tooltip="Issues"
                 className={`${
-                  pathname === "/issues"
+                  pathname === "/dashboard/issues"
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
                     : ""
                 }`}
@@ -89,11 +89,11 @@ export function NavMain() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/team">
+            <Link href="/dashboard/team">
               <SidebarMenuButton
                 tooltip="Team"
                 className={`${
-                  pathname === "/team"
+                  pathname === "/dashboard/team"
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
                     : ""
                 }`}

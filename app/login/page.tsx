@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useRouter } from "next/navigation";
-import { LoginForm } from "@/components/login-form";
 import { useDispatch } from "react-redux";
-import { setUser } from "../store/store";
+import { setAdmin } from "@/app/store/store";
+import { LoginForm } from "@/components/login-form";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,12 +14,26 @@ export default function LoginPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        dispatch(setUser(data.session.user));
+      if (data.session && data.session.user.email) {
+        fetchAdminData(data.session.user.email);
         router.push("/dashboard");
       }
     });
-  }, [router]);
+  }, [dispatch, router]);
+
+  const fetchAdminData = async (email: string) => {
+    const { data, error } = await supabase
+      .from("employees")
+      .select("*")
+      .eq("email", email)
+      .single();
+
+    if (error) {
+      console.error("Error fetching admin data:", error.message);
+    } else {
+      dispatch(setAdmin(data));
+    }
+  };
 
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
@@ -30,7 +44,7 @@ export default function LoginPage() {
 
     if (error) alert("Login failed: " + error.message);
     else if (data.session) {
-      dispatch(setUser(data.session.user));
+      fetchAdminData(email);
       router.push("/dashboard");
     }
 

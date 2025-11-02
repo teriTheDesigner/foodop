@@ -1,31 +1,57 @@
 import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface UserState {
-  user: any | {};
+interface AdminState {
+  admin: any | null;
 }
 
-const initialState: UserState = {
-  user: {},
+interface UserState {
+  users: any[];
+}
+
+const initialAdminState: AdminState = {
+  admin: null,
 };
 
-const userSlice = createSlice({
-  name: "user",
-  initialState,
+const initialUserState: UserState = {
+  users: [],
+};
+
+const adminSlice = createSlice({
+  name: "admin",
+  initialState: initialAdminState,
   reducers: {
-    setUser(state, action: PayloadAction<any>) {
-      state.user = action.payload;
+    setAdmin(state, action: PayloadAction<any>) {
+      state.admin = action.payload;
     },
-    clearUser(state) {
-      state.user = {};
+    clearAdmin(state) {
+      state.admin = null;
     },
   },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+const userSlice = createSlice({
+  name: "users",
+  initialState: initialUserState,
+  reducers: {
+    setUsers(state, action: PayloadAction<any[]>) {
+      state.users = action.payload;
+    },
+    addUser(state, action: PayloadAction<any>) {
+      state.users.push(action.payload);
+    },
+    removeUser(state, action: PayloadAction<string>) {
+      state.users = state.users.filter((user) => user.id !== action.payload);
+    },
+  },
+});
+
+export const { setAdmin, clearAdmin } = adminSlice.actions;
+export const { setUsers, addUser, removeUser } = userSlice.actions;
 
 const store = configureStore({
   reducer: {
-    user: userSlice.reducer,
+    admin: adminSlice.reducer,
+    users: userSlice.reducer,
   },
 });
 

@@ -4,16 +4,8 @@ interface AdminState {
   admin: any | null;
 }
 
-interface UserState {
-  users: any[];
-}
-
 const initialAdminState: AdminState = {
   admin: null,
-};
-
-const initialUserState: UserState = {
-  users: [],
 };
 
 const adminSlice = createSlice({
@@ -28,6 +20,13 @@ const adminSlice = createSlice({
     },
   },
 });
+interface UserState {
+  users: any[];
+}
+
+const initialUserState: UserState = {
+  users: [],
+};
 
 const userSlice = createSlice({
   name: "users",

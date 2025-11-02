@@ -12,7 +12,7 @@ import {
 import { useSelector } from "react-redux";
 
 export function NavUser() {
-  const user = useSelector((state: RootState) => state.user.user);
+  const admin = useSelector((state: RootState) => state.admin.admin);
   const { isMobile } = useSidebar();
   return (
     <SidebarMenu>
@@ -28,7 +28,7 @@ export function NavUser() {
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-medium">Username</span>
             <span className="text-muted-foreground truncate text-xs">
-              {user.email}
+              {admin?.email}
             </span>
           </div>
         </SidebarMenuButton>

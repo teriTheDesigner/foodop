@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useRouter } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -11,7 +11,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 import data from "../data.json";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/app/store/store";
+import { setAdmin } from "@/app/store/store";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function Dashboard() {
       if (!data.session) {
         router.push("/login");
       } else {
-        dispatch(setUser(data.session.user));
+        dispatch(setAdmin(data.session.user));
       }
     };
     checkSession();

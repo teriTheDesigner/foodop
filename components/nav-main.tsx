@@ -1,24 +1,7 @@
 "use client";
 
-import {
-  IconChartBar,
-  IconCirclePlusFilled,
-  IconDashboard,
-  IconFolder,
-  IconListDetails,
-  IconMail,
-  IconUsers,
-  type Icon,
-} from "@tabler/icons-react";
-
-import { Button } from "@/components/ui/button";
-import {
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+import { IconChartBar, IconFolder, IconListDetails, IconUsers, type Icon } from "@tabler/icons-react";
+import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -38,7 +21,7 @@ export function NavMain() {
                     : ""
                 }`}
               >
-                <IconDashboard />
+                <IconChartBar />
                 <span>Dashboard</span>
               </SidebarMenuButton>
             </Link>
@@ -59,32 +42,17 @@ export function NavMain() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/dashboard/analytics">
+            <Link href="/dashboard/subscriptions">
               <SidebarMenuButton
-                tooltip="Analytics"
+                tooltip="Subscriptions"
                 className={`${
-                  pathname === "/dashboard/analytics"
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-                    : ""
-                }`}
-              >
-                <IconChartBar />
-                <span>Analytics</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link href="/dashboard/issues">
-              <SidebarMenuButton
-                tooltip="Issues"
-                className={`${
-                  pathname === "/dashboard/issues"
+                  pathname === "/dashboard/subscriptions"
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
                     : ""
                 }`}
               >
                 <IconFolder />
-                <span>Issues</span>
+                <span>Subscriptions</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/app/lib/supabase";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 interface UserDialogProps {
   open: boolean;
@@ -77,7 +78,7 @@ export function UserDialog({
 
   const handleSubmit = () => {
     if (!formData.full_name || !formData.email) {
-      alert("Name and email are required.");
+      toast.error("Name and email are required.");
       return;
     }
     onSave(formData, selectedPlans);

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setAdmin } from "@/app/store/store";
 import { LoginForm } from "@/components/login-form";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,8 +43,9 @@ export default function LoginPage() {
       password,
     });
 
-    if (error) alert("Login failed: " + error.message);
+    if (error) toast("Login failed: " + error.message);
     else if (data.session) {
+      toast("Login successful!");
       fetchAdminData(email);
       router.push("/dashboard");
     }

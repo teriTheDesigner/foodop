@@ -4,31 +4,25 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import { SignupForm } from "@/components/signup-form";
+import { toast } from "sonner";
 
 export default function SignupPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleSignup = async (
-    fullName: string,
-    email: string,
-    password: string
-  ) => {
+  const handleSignup = async (fullName: string, email: string, password: string, role?: string) => {
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-    });
+    const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
 
     if (error) {
-      alert("Signup failed: " + error.message);
+      toast(`Signup failed: ${error.message}`);
       setLoading(false);
       return;
     }
 
     if (!data.user) {
-      alert("Signup failed: No user returned");
+      toast("Signup failed: User was not created");
       setLoading(false);
       return;
     }
@@ -42,13 +36,11 @@ export default function SignupPage() {
       },
     ]);
 
-    if (employeeError)
-      alert("Error adding to employees table: " + employeeError.message);
+    if (employeeError) toast(`Employee profile could not be created: ${employeeError.message}`);
     else {
-      alert("Signup successful! Please log in.");
+      toast("Signup successful!");
       router.push("/login");
     }
-
     setLoading(false);
   };
   return (

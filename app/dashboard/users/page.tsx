@@ -131,10 +131,10 @@ export default function UsersPage() {
 
     const { error } = await supabase.from("users").delete().eq("id", userId);
     if (error) {
-      toast.error("Failed to delete user: " + error.message);
+      toast("Failed to delete user: " + error.message);
     } else {
       dispatch(removeUser(userId));
-      toast.success("User deleted successfully");
+      toast("User deleted successfully");
     }
   };
 

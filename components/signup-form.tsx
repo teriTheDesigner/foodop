@@ -33,14 +33,11 @@ export function SignupForm({ onSubmit, loading, className, ...props }: any) {
         </div>
         <Field>
           <FieldLabel htmlFor="name">Full Name</FieldLabel>
-          <Input
-            id="name"
-            type="text"
-            placeholder="John Doe"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
+          <Input id="name" type="text" placeholder="John Doe" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="role">Role</FieldLabel>
+          <Input id="role" type="text" placeholder="Account Executive" value={role} onChange={(e) => setRole(e.target.value)} required />
         </Field>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>

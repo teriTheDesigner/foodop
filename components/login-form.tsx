@@ -47,6 +47,7 @@ export function LoginForm({ onSubmit, loading, className, ...props }: any) {
           <Input
             id="password"
             type="password"
+            placeholder="********"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

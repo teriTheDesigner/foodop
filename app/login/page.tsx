@@ -23,14 +23,10 @@ export default function LoginPage() {
   }, [dispatch, router]);
 
   const fetchAdminData = async (email: string) => {
-    const { data, error } = await supabase
-      .from("employees")
-      .select("*")
-      .eq("email", email)
-      .single();
+    const { data, error } = await supabase.from("employees").select("*").eq("email", email).single();
 
     if (error) {
-      console.error("Error fetching admin data:", error.message);
+      toast("Error logging in: " + error.message);
     } else {
       dispatch(setAdmin(data));
     }

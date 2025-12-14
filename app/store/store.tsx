@@ -44,13 +44,39 @@ const userSlice = createSlice({
   },
 });
 
+interface EmployeesState {
+  employees: any[];
+}
+
+const initialEmployeesState: EmployeesState = {
+  employees: [],
+};
+
+const employeesSlice = createSlice({
+  name: "employees",
+  initialState: initialEmployeesState,
+  reducers: {
+    setEmployees(state, action: PayloadAction<any[]>) {
+      state.employees = action.payload;
+    },
+    addEmployee(state, action: PayloadAction<any>) {
+      state.employees.push(action.payload);
+    },
+    removeEmployee(state, action: PayloadAction<string>) {
+      state.employees = state.employees.filter((emp) => emp.id !== action.payload);
+    },
+  },
+});
+
 export const { setAdmin, clearAdmin } = adminSlice.actions;
 export const { setUsers, addUser, removeUser } = userSlice.actions;
+export const { setEmployees, addEmployee, removeEmployee } = employeesSlice.actions;
 
 const store = configureStore({
   reducer: {
     admin: adminSlice.reducer,
     users: userSlice.reducer,
+    employees: employeesSlice.reducer,
   },
 });
 

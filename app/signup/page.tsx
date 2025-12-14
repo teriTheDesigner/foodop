@@ -10,7 +10,7 @@ export default function SignupPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleSignup = async (fullName: string, email: string, password: string, role?: string) => {
+  const handleSignup = async (fullName: string, email: string, password: string, role: string) => {
     setLoading(true);
 
     const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
@@ -32,7 +32,7 @@ export default function SignupPage() {
         id: data.user.id,
         full_name: fullName,
         email,
-        role: "admin",
+        role: role,
       },
     ]);
 

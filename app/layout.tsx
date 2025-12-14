@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${montserrat.variable} antialiased`}>
         <ReduxProvider>{children}</ReduxProvider>
-        <Toaster />
+        <Toaster position="top-center" />
       </body>
     </html>
   );

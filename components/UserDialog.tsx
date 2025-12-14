@@ -1,18 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/app/lib/supabase";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { Switch } from "./ui/switch";
 
 interface UserDialogProps {
   open: boolean;
@@ -21,16 +16,12 @@ interface UserDialogProps {
   onSave: (user: any, selectedPlans: string[]) => void;
 }
 
-export function UserDialog({
-  open,
-  onOpenChange,
-  user,
-  onSave,
-}: UserDialogProps) {
+export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps) {
   const [formData, setFormData] = useState({
     id: "",
     full_name: "",
     email: "",
+    phone: "",
     status: "active",
   });
 
@@ -51,17 +42,17 @@ export function UserDialog({
         id: user.id,
         full_name: user.full_name,
         email: user.email,
+        phone: user.phone,
         status: user.status,
       });
 
-      setSelectedPlans(
-        user.user_subscriptions?.map((s: any) => s.subscription_plans.id) || []
-      );
+      setSelectedPlans(user.user_subscriptions?.map((s: any) => s.subscription_plans.id) || []);
     } else {
       setFormData({
         id: "",
         full_name: "",
         email: "",
+        phone: "",
         status: "active",
       });
       setSelectedPlans([]);
@@ -69,11 +60,7 @@ export function UserDialog({
   }, [user]);
 
   const togglePlan = (planId: string) => {
-    setSelectedPlans((prev) =>
-      prev.includes(planId)
-        ? prev.filter((id) => id !== planId)
-        : [...prev, planId]
-    );
+    setSelectedPlans((prev) => (prev.includes(planId) ? prev.filter((id) => id !== planId) : [...prev, planId]));
   };
 
   const handleSubmit = () => {
@@ -93,15 +80,24 @@ export function UserDialog({
         </DialogHeader>
 
         <div className="space-y-4">
+          <div className="flex items-center gap-8 text-sm">
+            <label className="block mb-1">Status</label>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={formData.status === "active"}
+                onCheckedChange={(checked) => setFormData({ ...formData, status: checked ? "active" : "inactive" })}
+              />
+              <span className="text-muted-foreground">{formData.status === "active" ? "Active" : "Inactive"}</span>
+            </div>
+          </div>
           <div>
             <label className="block text-sm mb-1">Full Name</label>
             <Input
               name="full_name"
               value={formData.full_name}
-              onChange={(e) =>
-                setFormData({ ...formData, full_name: e.target.value })
-              }
-              placeholder="Enter full name"
+              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+              placeholder="John Smith"
+              className="placeholder:text-gray-400  text-muted-foreground"
             />
           </div>
 
@@ -110,25 +106,30 @@ export function UserDialog({
             <Input
               name="email"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              placeholder="Enter email"
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="john@example.com"
+              className="placeholder:text-gray-400  text-muted-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Subscriptions
-            </label>
+            <label className="block text-sm mb-1">Phone number</label>
+            <Input
+              name="phone"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              placeholder="+45 12 34 56 78"
+              className="placeholder:text-gray-400  text-muted-foreground"
+            />
+          </div>
 
-            <div className="space-y-2 border p-3 rounded-md">
+          <div>
+            <label className="block text-sm font-medium mb-1">Subscriptions</label>
+
+            <div className="space-y-2 border text-muted-foreground p-3 rounded-md">
               {plans.map((plan) => (
-                <label key={plan.id} className="flex items-center gap-2">
-                  <Checkbox
-                    checked={selectedPlans.includes(plan.id)}
-                    onCheckedChange={() => togglePlan(plan.id)}
-                  />
+                <label key={plan.id} className="flex items-center gap-2 text-sm">
+                  <Checkbox checked={selectedPlans.includes(plan.id)} onCheckedChange={() => togglePlan(plan.id)} />
                   <span>
                     {plan.name} — {plan.price} DKK
                   </span>
@@ -136,30 +137,13 @@ export function UserDialog({
               ))}
             </div>
           </div>
-
-          <div>
-            <label className="block text-sm mb-1">Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={(e) =>
-                setFormData({ ...formData, status: e.target.value })
-              }
-              className="w-full border rounded p-2"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>
-            {user ? "Save Changes" : "Add User"}
-          </Button>
+          <Button onClick={handleSubmit}>{user ? "Save Changes" : "Add User"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

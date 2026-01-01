@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { TeamDialog } from "@/components/TeamDialog";
+import TableSkeleton from "@/components/table-skeleton";
 
 export default function TeamPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,6 +24,7 @@ export default function TeamPage() {
 
   useEffect(() => {
     const fetchEmployees = async () => {
+      setLoading(true);
       const { data, error } = await supabase
         .from("employees")
         .select(`id, full_name, email, role, created_at`)
@@ -33,6 +35,7 @@ export default function TeamPage() {
       } else {
         dispatch(setEmployees(data || []));
       }
+      setLoading(false);
     };
 
     fetchEmployees();
@@ -74,6 +77,7 @@ export default function TeamPage() {
   };
 
   const createNewEmployee = async (employeeData: any) => {
+    setLoading(true);
     const { data, error } = await supabase.auth.signUp({ email: employeeData.email.trim(), password: "TemporaryPassword123!" });
 
     if (error) {
@@ -145,7 +149,7 @@ export default function TeamPage() {
           <h1 className="text-3xl font-bold text-foreground">Team</h1>
           <p className="text-muted-foreground mt-2">Manage your team and their information</p>
         </div>
-        <Button onClick={handleAddEmployee} className="gap-2">
+        <Button onClick={handleAddEmployee} disabled={loading} className="gap-2">
           <Plus className="h-4 w-4" />
           Add New
         </Button>
@@ -176,41 +180,54 @@ export default function TeamPage() {
                 </tr>
               </thead>
               <tbody className="text-sm">
-                {filteredEmployees.map((employee) => (
-                  <tr key={employee.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                    <td className="py-4 px-4 font-medium">{employee.full_name}</td>
-                    <td className="py-4 px-4 text-muted-foreground">
-                      <div className="flex flex-col gap-1">
-                        <span>{employee.email}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-muted-foreground">
-                      <div className="flex flex-col gap-1">
-                        <span>{employee.role}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-muted-foreground">{new Date(employee.created_at).toLocaleDateString()}</td>
-                    <td className="py-4 px-4 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEditEmployee(employee)}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDeleteEmployee(employee.id)} className="text-destructive">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {loading ? (
+                  <TableSkeleton team={true} />
+                ) : filteredEmployees.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-muted-foreground">
+                      No employees found
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredEmployees.map((employee) => (
+                    <tr key={employee.id} className="border-b border-border hover:bg-muted/50 transition-colors">
+                      <td className="py-4 px-4 font-medium">
+                        <img src="/profile.jpg" alt={employee.full_name} className="inline-block w-16 h-16 rounded-full object-cover mr-3" />
+                        {employee.full_name}
+                      </td>
+                      <td className="py-4 px-4 text-muted-foreground">
+                        <div className="flex flex-col gap-1">
+                          <span>{employee.email}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-muted-foreground">
+                        <div className="flex flex-col gap-1">
+                          <span>{employee.role}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-muted-foreground">{new Date(employee.created_at).toLocaleDateString()}</td>
+                      <td className="py-4 px-4 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditEmployee(employee)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDeleteEmployee(employee.id)} className="text-destructive">
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

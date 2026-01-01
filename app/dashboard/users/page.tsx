@@ -2,18 +2,18 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { supabase } from "@/app/lib/supabase";
-import { setUsers, removeUser } from "@/app/store/store";
+import { setUsers } from "@/app/store/store";
 import { RootState, AppDispatch } from "@/app/store/store";
-import { Plus, Search, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { UserDialog } from "@/components/UserDialog";
 import { toast } from "sonner";
 import TableSkeleton from "@/components/table-skeleton";
+import { getStatusColor } from "@/lib/utils";
+import { UserRow } from "@/components/UserRow";
+import { deleteUser, fetchUsers, saveUser } from "./service";
 
 export default function UsersPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,52 +24,21 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const loadUsers = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("users")
-        .select(
-          `
-        id,
-        full_name,
-        email,
-        phone,
-        status,
-        created_at,
-        user_subscriptions (
-          id,
-          status,
-          start_date,
-          renewal_date,
-          subscription_plans (
-            id,
-            name,
-            price
-          )
-        )
-      `
-        )
-        .order("created_at", { ascending: false });
-      if (error) {
-        toast("Error fetching users:" + error.message);
-        dispatch(setUsers([]));
-      } else {
-        dispatch(setUsers(data || []));
-      }
+      const usersData = await fetchUsers();
+      dispatch(setUsers(usersData));
       setLoading(false);
     };
-
-    fetchUsers();
+    loadUsers();
   }, [dispatch]);
 
-  const filteredUsers = useMemo(() => {
-    return users.filter(
-      (user) =>
-        user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (user.phone && user.phone.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  }, [searchQuery, users]);
+  const handleSaveUser = async (userData: any, planIds: string[]) => {
+    await saveUser(userData, planIds, !!selectedUser);
+    const usersData = await fetchUsers();
+    dispatch(setUsers(usersData));
+    setDialogOpen(false);
+  };
 
   const handleAddUser = () => {
     setSelectedUser(null);
@@ -81,124 +50,27 @@ export default function UsersPage() {
     setDialogOpen(true);
   };
 
-  const saveUpdatedUser = async (userData: any, planIds: string[]) => {
-    const { error: updateError } = await supabase
-      .from("users")
-      .update({
-        full_name: userData.full_name,
-        email: userData.email,
-        phone: userData.phone,
-        status: userData.status,
-      })
-      .eq("id", userData.id);
-
-    if (updateError) {
-      toast(`Failed to update user: ${updateError.message}`);
-      return;
-    }
-
-    const { error: deleteError } = await supabase.from("user_subscriptions").delete().eq("user_id", userData.id);
-
-    if (deleteError) {
-      toast(`Failed to remove old subscriptions: ${deleteError.message}`);
-      return;
-    }
-
-    const newSubs = planIds.map((pid) => ({
-      user_id: userData.id,
-      plan_id: pid,
-      status: "active",
-    }));
-
-    const { error: insertError } = await supabase.from("user_subscriptions").insert(newSubs);
-    if (insertError) {
-      toast(`Failed to add subscriptions: ${insertError.message}`);
-      return;
-    }
-
-    toast("User updated successfully");
-  };
-
-  const createNewUser = async (userData: any, planIds: string[]) => {
-    const { id, ...dataWithoutId } = userData;
-
-    const { data: created, error: insertError } = await supabase.from("users").insert(dataWithoutId).select().single();
-
-    if (insertError) {
-      toast(`Failed to create user: ${insertError.message}`);
-      return;
-    }
-
-    const newSubs = planIds.map((pid) => ({
-      user_id: created.id,
-      plan_id: pid,
-      status: "active",
-    }));
-
-    const { error: subError } = await supabase.from("user_subscriptions").insert(newSubs);
-    if (subError) {
-      toast(`Failed to assign subscriptions: ${subError.message}`);
-      return;
-    }
-
-    toast("User created successfully");
-  };
-
-  const handleSaveUser = async (userData: any, planIds: string[]) => {
-    if (selectedUser) {
-      await saveUpdatedUser(userData, planIds);
-    } else {
-      await createNewUser(userData, planIds);
-    }
-
-    const { data } = await supabase
-      .from("users")
-      .select(
-        `
-    id,
-    full_name,
-    email,
-    phone,
-    status,
-    created_at,
-    user_subscriptions (
-      id,
-      status,
-      subscription_plans (id, name, price)
-    )
-  `
-      )
-      .order("created_at", { ascending: false });
-
-    dispatch(setUsers(data ?? []));
-    setDialogOpen(false);
-  };
-
   const handleDeleteUser = (userId: string) => {
-    toast("Are you sure you want to delete this user?", {
+    toast("Are you sure?", {
       action: {
         label: "Delete",
         onClick: async () => {
-          const { error } = await supabase.from("users").delete().eq("id", userId);
-
-          if (error) {
-            toast("Failed to delete user: " + error.message);
-          } else {
-            dispatch(removeUser(userId));
-            toast("User deleted successfully");
-          }
+          const success = await deleteUser(userId);
+          if (success) dispatch(setUsers(users.filter((user) => user.id !== userId)));
         },
       },
-      cancel: {
-        label: "Cancel",
-        onClick: () => {},
-      },
+      cancel: { label: "Cancel", onClick: () => {} },
     });
   };
 
-  const getStatusColor = (status: string) => {
-    return status === "active" ? "bg-green-100 text-green-800" : status === "inactive" ? "bg-gray-100 text-gray-800" : "bg-red-100 text-red-800";
-  };
+  const filteredUsers = useMemo(() => {
+    return users.filter(
+      (user) =>
+        user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (user.phone && user.phone.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }, [searchQuery, users]);
 
   return (
     <div className="space-y-6 m-4 md:m-6 ">
@@ -249,52 +121,7 @@ export default function UsersPage() {
                   </tr>
                 ) : (
                   filteredUsers.map((user) => (
-                    <tr key={user.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                      <td className="py-4 px-4 font-medium">{user.full_name}</td>
-                      <td className="py-4 px-4 text-muted-foreground">
-                        <div className="flex flex-col gap-1">
-                          <span>{user.email}</span>
-                          <span>{user.phone}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        {user.user_subscriptions && user.user_subscriptions.length > 0 ? (
-                          <div className="flex flex-col gap-1">
-                            {user.user_subscriptions.map((sub: any) => (
-                              <Badge key={sub.id} className="bg-zinc-100 text-zinc-800">
-                                {sub.subscription_plans?.name}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">No subscriptions</span>
-                        )}
-                      </td>
-
-                      <td className="py-4 px-4">
-                        <Badge className={getStatusColor(user.status)}>{user.status}</Badge>
-                      </td>
-                      <td className="py-4 px-4 text-muted-foreground">{new Date(user.created_at).toLocaleDateString()}</td>
-                      <td className="py-4 px-4 text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditUser(user)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDeleteUser(user.id)} className="text-destructive">
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
+                    <UserRow key={user.id} user={user} onEdit={handleEditUser} onDelete={handleDeleteUser} getStatusColor={getStatusColor} />
                   ))
                 )}
               </tbody>

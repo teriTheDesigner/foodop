@@ -23,7 +23,10 @@ export default function TeamPage() {
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const { data, error } = await supabase.from("employees").select(`id, full_name, email, role, created_at`);
+      const { data, error } = await supabase
+        .from("employees")
+        .select(`id, full_name, email, role, created_at`)
+        .order("created_at", { ascending: false });
       if (error) {
         toast("Error fetching employees:" + error.message);
         dispatch(setEmployees([]));
@@ -107,7 +110,7 @@ export default function TeamPage() {
       await createNewEmployee(employeeData);
     }
 
-    const { data } = await supabase.from("employees").select(`id, full_name, email, role, created_at`);
+    const { data } = await supabase.from("employees").select(`id, full_name, email, role, created_at`).order("created_at", { ascending: false });
 
     dispatch(setEmployees(data ?? []));
     setDialogOpen(false);
@@ -156,7 +159,7 @@ export default function TeamPage() {
               <Input placeholder="Search users..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
             </div>
             <CardTitle className="text-muted-foreground font-normal">
-              {filteredEmployees.length} {filteredEmployees.length === 1 ? "colleague" : "colleagues"}
+              {filteredEmployees.length} {filteredEmployees.length === 1 ? "team member" : "team members"}
             </CardTitle>
           </div>
         </CardHeader>

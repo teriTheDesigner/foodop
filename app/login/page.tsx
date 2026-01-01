@@ -41,7 +41,7 @@ export default function LoginPage() {
 
     if (error) toast("Login failed: " + error.message);
     else if (data.session) {
-      toast("Login successful!");
+      toast("Welcome back!");
       fetchAdminData(email);
       router.push("/dashboard");
     }

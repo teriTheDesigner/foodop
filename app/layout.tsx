@@ -12,6 +12,10 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "FoodOp Dashboard",
   description: "Admin dashboard built with Next.js and Tailwind CSS",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({

@@ -1,4 +1,5 @@
 import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import subscriptionsSlice from "./subscriptionsSlice";
 
 interface AdminState {
   admin: any | null;
@@ -77,6 +78,7 @@ const store = configureStore({
     admin: adminSlice.reducer,
     users: userSlice.reducer,
     employees: employeesSlice.reducer,
+    subscriptions: subscriptionsSlice,
   },
 });
 

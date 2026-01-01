@@ -23,7 +23,10 @@ export default function UsersPage() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase.from("users").select(`
+      const { data, error } = await supabase
+        .from("users")
+        .select(
+          `
         id,
         full_name,
         email,
@@ -41,7 +44,9 @@ export default function UsersPage() {
             price
           )
         )
-      `);
+      `
+        )
+        .order("created_at", { ascending: false });
       if (error) {
         toast("Error fetching users:" + error.message);
         dispatch(setUsers([]));
@@ -142,7 +147,10 @@ export default function UsersPage() {
       await createNewUser(userData, planIds);
     }
 
-    const { data } = await supabase.from("users").select(`
+    const { data } = await supabase
+      .from("users")
+      .select(
+        `
     id,
     full_name,
     email,
@@ -154,7 +162,9 @@ export default function UsersPage() {
       status,
       subscription_plans (id, name, price)
     )
-  `);
+  `
+      )
+      .order("created_at", { ascending: false });
 
     dispatch(setUsers(data ?? []));
     setDialogOpen(false);
